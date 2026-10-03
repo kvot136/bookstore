@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 
@@ -29,7 +29,7 @@ function App() {
     price: ''
   });
 
-  const booksUrl = 'https://bookstore-a330a-default-rtdb.asia-southeast1.firebasedatabase.app/';
+  const booksUrl = 'TEST URL/books';
 
   const columnDefs = [
     { field: 'title', headerName: 'Title', sortable: true, filter: true },
@@ -42,7 +42,7 @@ function App() {
       field: 'id',
       sortable: false,
       filter: false,
-      cellRenderer: (params) =>
+      cellRenderer: (params) => (
         <IconButton
           size="small"
           color="error"
@@ -50,12 +50,9 @@ function App() {
         >
           <DeleteIcon />
         </IconButton>
+      )
     }
   ];
-
-  useEffect(() => {
-    fetchBooks();
-  }, []);
 
   const fetchBooks = () => {
     fetch(`${booksUrl}.json`)
@@ -64,6 +61,10 @@ function App() {
       .catch(err => console.error(err));
   };
 
+  useEffect(() => {
+    fetchBooks();
+  }, []);
+
   const addKeys = (data) => {
     if (!data) {
       setBooks([]);
@@ -71,9 +72,10 @@ function App() {
     }
 
     const keys = Object.keys(data);
-    const valueKeys = Object.values(data).map((item, index) =>
-      Object.defineProperty(item, 'id', { value: keys[index] })
-    );
+    const valueKeys = Object.values(data).map((item, index) => ({
+      ...item,
+      id: keys[index]
+    }));
 
     setBooks(valueKeys);
   };
@@ -85,6 +87,9 @@ function App() {
   const addBook = () => {
     fetch(`${booksUrl}.json`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(book)
     })
       .then(() => fetchBooks())
@@ -113,21 +118,25 @@ function App() {
     <>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6">
-            Bookstore
-          </Typography>
+          <Typography variant="h6">Bookstore</Typography>
         </Toolbar>
       </AppBar>
 
-      <Button variant="outlined" onClick={() => setOpen(true)}>
-        Add book
-      </Button>
+      <div className="bookstore-content">
+        <Button
+          className="add-button"
+          variant="outlined"
+          onClick={() => setOpen(true)}
+        >
+          Add book
+        </Button>
 
-      <div style={{ height: 500, width: '100%' }}>
-        <AgGridReact
-          rowData={books}
-          columnDefs={columnDefs}
-        />
+        <div style={{ height: 500, width: '100%' }}>
+          <AgGridReact
+            rowData={books}
+            columnDefs={columnDefs}
+          />
+        </div>
       </div>
 
       <Dialog open={open} onClose={() => setOpen(false)}>
