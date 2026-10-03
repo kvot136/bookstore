@@ -29,7 +29,7 @@ function App() {
     price: ''
   });
 
-  const booksUrl = 'TEST URL/books';
+  const booksUrl = 'https://bookstore-a330a-default-rtdb.asia-southeast1.firebasedatabase.app/';
 
   const columnDefs = [
     { field: 'title', headerName: 'Title', sortable: true, filter: true },
